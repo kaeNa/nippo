@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}日報一覧{% endblock title %}
+
+{% block extrahead %}
+<style>
+table {
+  margin-top: 8px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <h3 class="page-header">日報一覧</h3>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>日付</th>
+          <th>タイトル</th>
+          <th>投稿者</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr>
+          <td>{{ report.id }}</td>
+          <td>{{ report.name }}</td>
+          <td style="overflow : visible;">{{ report.publisher }}</td>
+          <td>{{ report.page }}</td>
+          <td>
+            <a href="{% url 'day:impression_list' report_id=report.id %}" class="btn btn-default btn-sm btn-primary">感想の一覧</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    <a href="{% url 'day:report_list' %}" class="btn btn-default btn-sm">戻る</a>
+    </table>
+{% endblock content %}
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+    <!--<meta charset="UTF-8">-->
+    <!--<title>Title</title>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--</body>-->
+<!--</html>-->
