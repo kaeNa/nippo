@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Report, Impression, Question
-from .forms import ReportForm, ImpressionForm, QuestionForm, SearchForm
+from .forms import ReportForm, ImpressionForm, QuestionForm, SearchForm, AnswerForm
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -19,6 +19,7 @@ from . import report_api
 from . import comment_api
 from . import search_function
 from . import question_level_api
+from . import question_answer_api
 
 
 def create_user(request):
@@ -49,8 +50,7 @@ def report_edit(request, report_id=None):
     # 日報の選択
     report = report_api.show(report_id, request.user.username)
     question = question_level_api.show(report_id)
-    print("abcd")
-    print(question.question_content)
+    # print(question.question_level_1)
     # POSTかGETか
     if request.method == 'POST':
         report_form, report_id = report_api.edit(request.POST, report, request.user.username)
@@ -156,6 +156,39 @@ def impression_del(request, report_id, impression_id):
     """感想の削除"""
     comment_api.delete(impression_id)
     return redirect('day:impression_list', report_id=report_id)
+
+
+def list_answer(request, question_id=None):
+    answer = question_answer_api.list(question_id)
+    question = get_object_or_404(Report, pk=question_id)
+    return render(request,
+                  'day/impression_list.html',  # 使用するテンプレート
+                  {'answer': answer, 'question': question, 'question_id' : question_id})
+
+
+@login_required
+def edit_answer(request, question_id, answer_id=None):
+    """感想の編集"""
+    # コメントが新規か編集かを選択
+    answer = question_answer_api.show(answer_id)
+    if request.method == 'POST':
+        form = question_answer_api.edit(request.POST, answer, question_id)
+        # form = ImpressionForm(request.POST, instance=comment)  # POST された request データからフォームを作成
+        if form.is_valid():    # フォームのバリデーション
+            return redirect('day:answer_list', question_id=question_id)
+    else:    # GET の時
+        form = AnswerForm(instance=answer)  # impression インスタンスからフォームを作成
+
+    return render(request,
+                  'day/answer_edit.html',
+                  dict(form=form, question_id=question_id, answer_id=answer_id))
+
+
+@login_required
+def del_answer(request, question_id, answer_id):
+    """感想の削除"""
+    question_answer_api.delete(answer_id)
+    return redirect('day:answer_list', question_id=question_id)
 
 
 # 検索フォームの作成

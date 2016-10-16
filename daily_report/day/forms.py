@@ -1,6 +1,6 @@
 # from django.forms import ModelForm
 from django import forms
-from .models import Report, Impression, Question
+from .models import Report, Impression, Question, CommentQuestion
 
 
 class ImpressionForm(forms.ModelForm):
@@ -26,6 +26,12 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = ('question_content',)
         # fields = "__all__"
+
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = CommentQuestion
+        fields = ('answer',)
 
 
 class SearchForm(forms.Form):
