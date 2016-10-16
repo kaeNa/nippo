@@ -21,10 +21,12 @@ class ReportForm(forms.ModelForm):
         # fields = ('date', 'title', 'user',)
 
 
-# class QuestionLevelForm(forms.ModelForm):
-#     class Meta:
-#         model = Question
-#         fields = ('question_content')
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ('question_content',)
+        # fields = "__all__"
+
 
 class SearchForm(forms.Form):
 

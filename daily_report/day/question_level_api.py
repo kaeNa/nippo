@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Report, Impression,Question
-from .forms import ReportForm, ImpressionForm, SearchForm
+from .forms import ReportForm, ImpressionForm, QuestionForm, SearchForm
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -28,7 +28,7 @@ def list(report_id):
 def show(report_id):
     if report_id:   # report_id が指定されている (修正時)
         # question = get_object_or_404(Question, pk=report_id)
-        question = Report.objects.all().prefetch_related("levels").get(id=report_id).levels.all()[0]
+        question = Report.objects.all().prefetch_related("questions").get(id=report_id).questions.all()[0]
         # question = Question.abjects.get(id=report_id)
         # print(question.question_level_1)
     else:         # report_id が指定されていない (追加時)
@@ -39,7 +39,7 @@ def show(report_id):
 
 def edit(post_data, question, report_id):
     report = get_object_or_404(Report, pk=report_id)
-    form = Question(post_data, instance=question)  # POST された request データからフォームを作成
+    form = QuestionForm(post_data, instance=question)  # POST された request データからフォームを作成
     if form.is_valid():  # フォームのバリデーション
         question = form.save(commit=False)
         question.report = report

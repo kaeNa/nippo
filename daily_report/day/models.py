@@ -40,10 +40,10 @@ class Question(models.Model):
         return self.question
 
 
-class CommentQuestion(models.Model):
-    question = models.ForeignKey(Report, verbose_name='日報', related_name='answers')
-    answer = models.TextField('質問に対しての回答', blank=True)
-
-    def __str__(self):
-        return self.question
+# class CommentQuestion(models.Model):
+#     question = models.ForeignKey(Report, verbose_name='日報', related_name='answers')
+#     answer = models.TextField('質問に対しての回答', blank=True)
+#
+#     def __str__(self):
+#         return self.questioncomment
 

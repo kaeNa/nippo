@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Report, Impression, Question
-from .forms import ReportForm, ImpressionForm, SearchForm
+from .forms import ReportForm, ImpressionForm, QuestionForm, SearchForm
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -49,7 +49,8 @@ def report_edit(request, report_id=None):
     # 日報の選択
     report = report_api.show(report_id, request.user.username)
     question = question_level_api.show(report_id)
-    # print(question.question_level_1)
+    print("abcd")
+    print(question.question_content)
     # POSTかGETか
     if request.method == 'POST':
         report_form, report_id = report_api.edit(request.POST, report, request.user.username)
@@ -61,7 +62,7 @@ def report_edit(request, report_id=None):
             return redirect('day:report_list')
     else:  # GET の時
         report_form = ReportForm(instance=report)  # report インスタンスからフォームを作成
-        question_form = Question(instance=question)
+        question_form = QuestionForm(instance=question)
 
     # print(question_form.question_level_1)
     # return render(request, 'day/report_edit.html', dict(report_form=report_form,
