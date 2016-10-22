@@ -1,19 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase
-from .models import Report, Impression
-from . import forms
-from . import views
+from .models import Report, Comment
 from django.contrib.auth.models import User
 from django.test.client import Client
-from django.http import HttpRequest
-from . import models
 from django.db.models import Q
-from django.template.loader import render_to_string
 from django.test import TestCase, RequestFactory
-from django.contrib.auth import authenticate
-import hashlib
-import random
-from django.core.exceptions import ObjectDoesNotExist
 
 
 # ユーザの作成
@@ -32,14 +22,14 @@ def delete_report(self, report_id):
 
 
 # 日報に対してのコメントの作成
-def create_impression(self, report, comment, comment_user, comment_time):
-    return Impression.objects.create(report=report, comment=comment, comment_user=comment_user,
+def create_comment(self, report, comment, comment_user, comment_time):
+    return Comment.objects.create(report=report, comment=comment, comment_user=comment_user,
                                      comment_time=comment_time)
 
 
 # コメントの削除
-def delete_impression(self, impression_id):
-    Report.objects.get(id=impression_id).delete()
+def delete_comment(self, comment_id):
+    Report.objects.get(id=comment_id).delete()
 
 
 #  ユーザの作成とログイン関係のテスト
@@ -170,7 +160,7 @@ class CommentTest(TestCase):
     # コメントの入力、編集、削除できるかを確認
     def test_immpression_add(self):
         report = create_report(self, self.title[0], self.content[0], self.user[0], self.time[0])
-        comment = create_impression(self, report, self.comment[0], self.comment_user[0], self.comment_time[0])
+        comment = create_comment(self, report, self.comment[0], self.comment_user[0], self.comment_time[0])
 
         # 各日報にコメントが入力されているかを確認
         self.assertEquals(comment.comment, self.comment[0])
@@ -189,8 +179,8 @@ class CommentTest(TestCase):
 
         # コメントの削除
         report_id = report.id
-        comment_id = Report.objects.all().prefetch_related("impressions").get(id=report_id).impressions.values()[0]['id']
-        comment = delete_impression(self, comment_id)
+        comment_id = Report.objects.all().prefetch_related("comments").get(id=report_id).comments.values()[0]['id']
+        comment = delete_comment(self, comment_id)
 
         # 各データが削除されているかを確認
         self.assertRaises(AttributeError, lambda: comment.comment)
@@ -220,13 +210,13 @@ class UrlAuthTest(TestCase):
 
         cls.transition_url = ['/report/', '/report/add/', '/report/search/',
                               '/report/mod/', '/report/browse/',
-                              '/impression/', '/impression/add/',
-                              '/impression/mod/']
+                              '/comment/', '/comment/add/',
+                              '/comment/mod/']
         cls.url_followed_by_one = ['/report/mod/', '/report/browse/',
-                                   '/impression/', '/impression/add/']
-        cls.url_followed_by_two = ['/impression/mod/']
-        cls.redirect_request_url = ['/report/del/', '/impression/del/']
-        cls.redirect_response_url = ['/report/', '/impression/']
+                                   '/comment/', '/comment/add/']
+        cls.url_followed_by_two = ['/comment/mod/']
+        cls.redirect_request_url = ['/report/del/', '/comment/del/']
+        cls.redirect_response_url = ['/report/', '/comment/']
 
     @classmethod
     def tearDownClass(cls):
@@ -247,7 +237,7 @@ class UrlAuthTest(TestCase):
         start_report_id = report.id
         for i in range(len(self.comment)):
             init_report = Report.objects.get(id=start_report_id + i)
-            comment = create_impression(self, init_report, self.comment[i], self.comment_user[i], self.comment_time[i])
+            comment = create_comment(self, init_report, self.comment[i], self.comment_user[i], self.comment_time[i])
 
         comment_id = comment.id
         end_report_id = init_report.id
@@ -269,7 +259,7 @@ class UrlAuthTest(TestCase):
             if self.redirect_request_url[i] == '/report/del/':
                 url = self.redirect_request_url[i] + str(start_report_id) + '/'
                 redirect_url = self.redirect_response_url[i]
-            elif self.redirect_request_url[i] == '/impression/del/':
+            elif self.redirect_request_url[i] == '/comment/del/':
                 url = self.redirect_request_url[i] + str(end_report_id) + '/' + str(comment_id) + '/'
                 redirect_url = self.redirect_response_url[i] + str(end_report_id) + '/'
             # print(url)
