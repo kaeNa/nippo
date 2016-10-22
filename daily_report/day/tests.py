@@ -13,7 +13,7 @@ def create_user(self, username, password):
 
 # 日報の作成
 def create_report(self, title, content, user, time):
-    return Report.objects.create(title=title, content=content, user=user, user_post_time=time)
+    return Report.objects.create(title=title, content_Y=content, user=user, user_post_time=time)
 
 
 # 日報の削除
@@ -111,18 +111,18 @@ class ReportTest(TestCase):
 
         # 各データが一致しているかを確認
         self.assertEquals(report.title, self.title[0])
-        self.assertEquals(report.content, self.content[0])
+        self.assertEquals(report.content_Y, self.content[0])
         self.assertEquals(report.user, self.user[0])
         self.assertEquals(report.user_post_time, self.time[0])
 
         # 日報の編集
         report.title = self.title[1]
-        report.content = self.content[1]
+        report.content_Y = self.content[1]
         report.user = self.user[1]
         report.user_post_time = self.time[1]
 
         self.assertEquals(report.title, self.title[1])
-        self.assertEquals(report.content, self.content[1])
+        self.assertEquals(report.content_Y, self.content[1])
         self.assertEquals(report.user, self.user[1])
         self.assertEquals(report.user_post_time, self.time[1])
 
@@ -134,7 +134,7 @@ class ReportTest(TestCase):
         # 各データが削除されているかを確認
         # self.assertRaises(ValueError, lambda: User.objects.create_user(self.no_user_id, None, self.no_password))
         self.assertRaises(AttributeError, lambda: report.title)
-        self.assertRaises(AttributeError, lambda: report.content)
+        self.assertRaises(AttributeError, lambda: report.content_Y)
         self.assertRaises(AttributeError, lambda: report.user)
         self.assertRaises(AttributeError, lambda: report.time)
         self.assertEquals(report, None)
@@ -301,7 +301,7 @@ class ViewsTest(TestCase):
 
         # 確認用
         # for  i in response_data.context['reports']:
-        #     print(i.title, i.content, i.user, i.user_post_time)
+        #     print(i.title, i.content_Y, i.user, i.user_post_time)
 
         # テストコード内でフィルターをかける
         # ほとんどviews.report_searchと同じ
@@ -309,7 +309,7 @@ class ViewsTest(TestCase):
         queries1 = [Q(user_post_time__icontains=word) for word in keyword]
         queries2 = [Q(user__icontains=word) for word in keyword]
         queries3 = [Q(title__icontains=word) for word in keyword]
-        queries4 = [Q(content__icontains=word) for word in keyword]
+        queries4 = [Q(content_Y__icontains=word) for word in keyword]
         query = queries1.pop(0)
 
         for item in queries1:
@@ -326,6 +326,6 @@ class ViewsTest(TestCase):
         # Searchクラスが正常に検索できているかをテスト
         for i, j in zip(response_data.context['reports'], input_report):
             self.assertEquals(i.title, j.title)
-            self.assertEquals(i.content, j.content)
+            self.assertEquals(i.content_Y, j.content_Y)
             self.assertEquals(i.user, j.user)
             self.assertEquals(i.user_post_time, j.user_post_time)
