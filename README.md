@@ -14,6 +14,7 @@ psql postgres postgres
 create user 'ユーザー名';  
 alter role ユーザー名 with password 'パスワード';  
 create database 'データベース名' owner 'ユーザー名';  
+alter role 'ユーザーネーム with createrole createdb;
 
 1. database.dummy.pyに設定したデータベース名、ユーザ名、パスワードを入力し、ファイル名のdummy部分を削除する  
 database.dummy.py  
