@@ -291,60 +291,51 @@ class ViewsTest(TestCase):
         cls.time = ['2006-04-01 12:34:56', '2010-12-25 00:00:00', '2016-08-24 15:43:06']
 
         cls.search_keyword = 'Terry'
-        # self.client = Client()
-        # self.client.post('/report/user_register/',
-        #                  {'username': 'john', 'password1': 'johnpass', 'password2': 'johnpass'})
-        # self.client.post('/report/login/', {'username': 'john', 'password': 'johnpass'})
 
     @classmethod
     def tearDownClass(cls):
         print("Success test")
 
-    # # 検索機能できるかどうかのテスト
-    # def test_search(self):
-    #     # テストコード内の検索に使用するキーワード
-    #     # keyword = 'Terry'
-    #
-    #     # データベースを作成
-    #     for i in range(len(self.title)):
-    #         create_report(self, self.title[i], self.content[i], self.user[i], self.time[i])
-    #
-    #     # 検索ページ(report_list.html)の呼び出し
-    #     client_user = Client()
-    #     response_data = client_user.post('/report/search/', {'Search': self.search_keyword})
-    #
-    #     # 確認用
-    #     # for  i in response_data.context['reports']:
-    #     #     print(i.title, i.content, i.user, i.user_post_time)
-    #
-    #     # テストコード内でフィルターをかける
-    #     # ほとんどviews.report_searchと同じ
-    #     keyword = self.search_keyword.split()
-    #     queries1 = [Q(user_post_time__icontains=word) for word in keyword]
-    #     queries2 = [Q(user__icontains=word) for word in keyword]
-    #     queries3 = [Q(title__icontains=word) for word in keyword]
-    #     queries4 = [Q(content__icontains=word) for word in keyword]
-    #     query = queries1.pop(0)
-    #
-    #     for item in queries1:
-    #         query |= item
-    #     for item in queries2:
-    #         query |= item
-    #     for item in queries3:
-    #         query |= item
-    #     for item in queries4:
-    #         query |= item
-    #
-    #     input_report = Report.objects.filter(query).order_by('id')
-    #
-    #     # Searchクラスが正常に検索できているかをテスト
-    #     for i, j in zip(response_data.context['reports'], input_report):
-    #         self.assertEquals(i.title, j.title)
-    #         self.assertEquals(i.content, j.content)
-    #         self.assertEquals(i.user, j.user)
-    #         self.assertEquals(i.user_post_time, j.user_post_time)
+    # 検索機能できるかどうかのテスト
+    def test_search(self):
+        # テストコード内の検索に使用するキーワード
+        # keyword = 'Terry'
 
+        # データベースを作成
+        for i in range(len(self.title)):
+            create_report(self, self.title[i], self.content[i], self.user[i], self.time[i])
 
-# response = self.client.post('/report/report_entries/',
-#                             {'report_title': 'test title', 'report_content': 'test'})
-# self.assertEqual(response.status_code, 302)
+        # 検索ページ(report_list.html)の呼び出し
+        client_user = Client()
+        response_data = client_user.post('/report/search/', {'Search': self.search_keyword})
+
+        # 確認用
+        # for  i in response_data.context['reports']:
+        #     print(i.title, i.content, i.user, i.user_post_time)
+
+        # テストコード内でフィルターをかける
+        # ほとんどviews.report_searchと同じ
+        keyword = self.search_keyword.split()
+        queries1 = [Q(user_post_time__icontains=word) for word in keyword]
+        queries2 = [Q(user__icontains=word) for word in keyword]
+        queries3 = [Q(title__icontains=word) for word in keyword]
+        queries4 = [Q(content__icontains=word) for word in keyword]
+        query = queries1.pop(0)
+
+        for item in queries1:
+            query |= item
+        for item in queries2:
+            query |= item
+        for item in queries3:
+            query |= item
+        for item in queries4:
+            query |= item
+
+        input_report = Report.objects.filter(query).order_by('id')
+
+        # Searchクラスが正常に検索できているかをテスト
+        for i, j in zip(response_data.context['reports'], input_report):
+            self.assertEquals(i.title, j.title)
+            self.assertEquals(i.content, j.content)
+            self.assertEquals(i.user, j.user)
+            self.assertEquals(i.user_post_time, j.user_post_time)
