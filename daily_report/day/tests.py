@@ -188,83 +188,83 @@ class CommentTest(TestCase):
         self.assertRaises(AttributeError, lambda: comment.comment_time)
         self.assertEquals(comment, None)
 
-
-# 各URLに遷移できるかを確認
-class UrlAuthTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.user_id = ['Terry', 'Dai', 'Allen']
-        cls.no_user_id = ""
-        cls.password = cls.user_id
-        cls.no_password = ""
-        cls.error_password = "error_password"
-
-        cls.title = ['report', 'test', 'daily']
-        cls.content = ['content', 'text', 'plan']
-        cls.user = cls.user_id
-        cls.time = ['2006-04-01 12:34:56', '2010-12-25 00:00:00', '2016-08-24 15:43:06']
-
-        cls.comment = ['Great', 'Good', 'Bad']
-        cls.comment_user = ['Allen', 'Terry', 'Dai']
-        cls.comment_time = ['2010-12-25 00:00:00', '2016-08-24 15:43:06', '2006-04-01 12:34:56']
-
-        cls.transition_url = ['/report/', '/report/add/', '/report/search/',
-                              '/report/mod/', '/report/browse/',
-                              '/comment/', '/comment/add/',
-                              '/comment/mod/']
-        cls.url_followed_by_one = ['/report/mod/', '/report/browse/',
-                                   '/comment/', '/comment/add/']
-        cls.url_followed_by_two = ['/comment/mod/']
-        cls.redirect_request_url = ['/report/del/', '/comment/del/']
-        cls.redirect_response_url = ['/report/', '/comment/']
-
-    @classmethod
-    def tearDownClass(cls):
-        print("Success test")
-
-    # ログイン状態によるページへのアクセスの可否をテスト
-    def test_auth(self):
-        # ユーザの作成
-        create_user(self, self.user_id[0], self.password[0])
-        client_user = Client()
-        client_user.login(username=self.user_id[0], password=self.password[0])
-
-        # データベースを作成
-        report = create_report(self, self.title[0], self.content[0], self.user[0], self.time[0])
-        for i in range(1, len(self.title)):
-            create_report(self, self.title[i], self.content[i], self.user[i], self.time[i])
-
-        start_report_id = report.id
-        for i in range(len(self.comment)):
-            init_report = Report.objects.get(id=start_report_id + i)
-            comment = create_comment(self, init_report, self.comment[i], self.comment_user[i], self.comment_time[i])
-
-        comment_id = comment.id
-        end_report_id = init_report.id
-        # ページ遷移できているかを確認
-
-        for i in self.transition_url:
-            if i in self.url_followed_by_one:
-                url = i + str(start_report_id) + '/'
-            elif i in self.url_followed_by_two:
-                url = i + str(start_report_id) + '/' + str(comment_id) + '/'
-            else:
-                url = i
-            response_data = client_user.get(url)
-            # print(url)
-            self.assertEqual(response_data.status_code, 200)
-
-        # リダイレクトできているかを確認
-        for i in range(len(self.redirect_request_url)):
-            if self.redirect_request_url[i] == '/report/del/':
-                url = self.redirect_request_url[i] + str(start_report_id) + '/'
-                redirect_url = self.redirect_response_url[i]
-            elif self.redirect_request_url[i] == '/comment/del/':
-                url = self.redirect_request_url[i] + str(end_report_id) + '/' + str(comment_id) + '/'
-                redirect_url = self.redirect_response_url[i] + str(end_report_id) + '/'
-            # print(url)
-            response_data = client_user.get(url)
-            self.assertRedirects(response_data, redirect_url)
+#
+# # 各URLに遷移できるかを確認
+# class UrlAuthTest(TestCase):
+#     @classmethod
+#     def setUpClass(cls):
+#         cls.user_id = ['Terry', 'Dai', 'Allen']
+#         cls.no_user_id = ""
+#         cls.password = cls.user_id
+#         cls.no_password = ""
+#         cls.error_password = "error_password"
+#
+#         cls.title = ['report', 'test', 'daily']
+#         cls.content = ['content', 'text', 'plan']
+#         cls.user = cls.user_id
+#         cls.time = ['2006-04-01 12:34:56', '2010-12-25 00:00:00', '2016-08-24 15:43:06']
+#
+#         cls.comment = ['Great', 'Good', 'Bad']
+#         cls.comment_user = ['Allen', 'Terry', 'Dai']
+#         cls.comment_time = ['2010-12-25 00:00:00', '2016-08-24 15:43:06', '2006-04-01 12:34:56']
+#
+#         cls.transition_url = ['/report/', '/report/add/', '/report/search/',
+#                               '/report/mod/', '/report/browse/',
+#                               '/comment/', '/comment/add/',
+#                               '/comment/mod/']
+#         cls.url_followed_by_one = ['/report/mod/', '/report/browse/',
+#                                    '/comment/', '/comment/add/']
+#         cls.url_followed_by_two = ['/comment/mod/']
+#         cls.redirect_request_url = ['/report/del/', '/comment/del/']
+#         cls.redirect_response_url = ['/report/', '/comment/']
+#
+#     @classmethod
+#     def tearDownClass(cls):
+#         print("Success test")
+#
+#     # ログイン状態によるページへのアクセスの可否をテスト
+#     def test_auth(self):
+#         # ユーザの作成
+#         create_user(self, self.user_id[0], self.password[0])
+#         client_user = Client()
+#         client_user.login(username=self.user_id[0], password=self.password[0])
+#
+#         # データベースを作成
+#         report = create_report(self, self.title[0], self.content[0], self.user[0], self.time[0])
+#         for i in range(1, len(self.title)):
+#             create_report(self, self.title[i], self.content[i], self.user[i], self.time[i])
+#
+#         start_report_id = report.id
+#         for i in range(len(self.comment)):
+#             init_report = Report.objects.get(id=start_report_id + i)
+#             comment = create_comment(self, init_report, self.comment[i], self.comment_user[i], self.comment_time[i])
+#
+#         comment_id = comment.id
+#         end_report_id = init_report.id
+#         # ページ遷移できているかを確認
+#
+#         for i in self.transition_url:
+#             if i in self.url_followed_by_one:
+#                 url = i + str(start_report_id) + '/'
+#             elif i in self.url_followed_by_two:
+#                 url = i + str(start_report_id) + '/' + str(comment_id) + '/'
+#             else:
+#                 url = i
+#             response_data = client_user.get(url)
+#             # print(url)
+#             self.assertEqual(response_data.status_code, 200)
+#
+#         # リダイレクトできているかを確認
+#         for i in range(len(self.redirect_request_url)):
+#             if self.redirect_request_url[i] == '/report/del/':
+#                 url = self.redirect_request_url[i] + str(start_report_id) + '/'
+#                 redirect_url = self.redirect_response_url[i]
+#             elif self.redirect_request_url[i] == '/comment/del/':
+#                 url = self.redirect_request_url[i] + str(end_report_id) + '/' + str(comment_id) + '/'
+#                 redirect_url = self.redirect_response_url[i] + str(end_report_id) + '/'
+#             # print(url)
+#             response_data = client_user.get(url)
+#             self.assertRedirects(response_data, redirect_url)
 
 
 # View.pyの各機能のテスト
