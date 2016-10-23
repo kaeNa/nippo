@@ -22,7 +22,7 @@ from django.views.generic import TemplateView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'', include('day.urls', namespace='day')),   # ←ここを追加
-    url(r'^$', 'django.contrib.auth.views.login', {'template_name': 'day/login.html'}),
+    url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'day/login.html'}),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'template_name': 'day/logged_out.html'}),
     # url(r'^$', 'day.views.index'),
     url(r'^register$', 'day.views.create_user'),
